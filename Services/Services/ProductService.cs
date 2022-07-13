@@ -1,4 +1,6 @@
-﻿using Domain.Model;
+﻿using AutoMapper;
+using Domain.Model;
+using Repository.Model;
 using Repository.Repository;
 using Services.IServices;
 using System;
@@ -12,31 +14,38 @@ namespace Services.Services
     public class ProductService: IProduct
     {
         private IRepository<Product> _ProductRepository;
-
-        public ProductService(IRepository<Product> productRepository)
+        private  IMapper _mapper;
+        public ProductService(IRepository<Product> productRepository, IMapper mapper)
         {
             _ProductRepository = productRepository;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Product> GetAllProducts()
+        public IEnumerable<ProductModel> GetAllProducts()
         {
-            return _ProductRepository.GetAll();
+            var result = _ProductRepository.GetAll();
+            var productModel = _mapper.Map<List<ProductModel>>(result);
+            return productModel;
         }
 
-        public Product GetProduct(int Id)
+        public ProductModel GetProduct(int Id)
         {
-            return _ProductRepository.Get(Id);
+            var result = _ProductRepository.Get(Id);
+            var productModel = _mapper.Map<ProductModel>(result);
+            return productModel;
         }
 
-        public bool InsertProduct(Product product)
+        public bool InsertProduct(EditProductModel product)
         {
-            product.IsActive = true;
-            product.ModifiedDate = DateTime.Now;
-            _ProductRepository.Insert(product);
+            var productEntity = _mapper.Map<Product>(product);
+
+            productEntity.IsActive = true;
+            productEntity.ModifiedDate = DateTime.Now;
+            _ProductRepository.Insert(productEntity);
             return _ProductRepository.SaveChanges();
         }
 
-        public bool UpdateProduct(Product product)
+        public bool UpdateProduct(ProductModel product)
         {
             Product productObject = _ProductRepository.Get(product.Id);
             if (productObject != null)
@@ -48,10 +57,10 @@ namespace Services.Services
                 _ProductRepository.Update(productObject);
             }
 
-            return _ProductRepository.SaveChanges();
+            return productObject != null && _ProductRepository.SaveChanges();
         }
 
-        public bool DeleteProduct(Product product, bool isLogicalDelete = true)
+        public bool DeleteProduct(ProductModel product, bool isLogicalDelete = true)
         {
             if (isLogicalDelete)
             {
@@ -65,7 +74,8 @@ namespace Services.Services
             }
             else
             {
-                _ProductRepository.Delete(product);
+                var productEntity = _mapper.Map<Product>(product);
+                _ProductRepository.Delete(productEntity);
             }
 
             return _ProductRepository.SaveChanges();

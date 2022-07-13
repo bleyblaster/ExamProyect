@@ -1,7 +1,7 @@
 ﻿using Authentication;
 using AutoMapper;
 using Domain.Model;
-using ExamProyect.Model;
+using Repository.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Repository;
 
 namespace ExamProyect
 {
@@ -53,15 +54,7 @@ namespace ExamProyect
         }
         public static void AddMapperConfig(this IServiceCollection services)
         {
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.CreateMap<User, UserModel>().ReverseMap();
-                mc.CreateMap<User, EditUserModel>().ReverseMap();
-                mc.CreateMap<Product, ProductModel>().ReverseMap();
-                mc.CreateMap<Product, EditProductModel>().ReverseMap();
-            });
-            IMapper mapper = mapperConfig.CreateMapper();
-            services.AddSingleton(mapper);
+            services.AddMapperExtension();
         }
 
         public static void AddJWTConfig(this IServiceCollection services, IConfiguration Configuration)

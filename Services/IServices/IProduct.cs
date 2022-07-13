@@ -7,10 +7,10 @@ namespace Services.IServices
 {
     public interface IProduct
     {
-        System.Collections.Generic.IEnumerable<Domain.Model.Product> GetAllProducts();
-        Domain.Model.Product GetProduct(int Id);
-        bool InsertProduct(Domain.Model.Product product);
-        bool UpdateProduct(Domain.Model.Product product);
-        bool DeleteProduct(Domain.Model.Product product, bool isLogicalDelete = true);
+        System.Collections.Generic.IEnumerable<Repository.Model.ProductModel> GetAllProducts();
+        Repository.Model.ProductModel GetProduct(int Id);
+        bool InsertProduct(Repository.Model.EditProductModel product);
+        bool UpdateProduct(Repository.Model.ProductModel product);
+        bool DeleteProduct(Repository.Model.ProductModel product, bool isLogicalDelete = true);
     }
 }

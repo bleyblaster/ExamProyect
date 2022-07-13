@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using Domain.Model;
-using ExamProyect.Model;
+using Repository.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.IServices;
@@ -17,21 +16,18 @@ namespace ExamProyect.Controllers.v1
     public class ProductController : Controller
     {
         private readonly IProduct _IProduct;
-        private readonly IMapper _mapper;
 
-        public ProductController(IProduct product, IMapper mapper)
+        public ProductController(IProduct product)
         {
             _IProduct = product;
-            _mapper = mapper;
         }
         [HttpGet(nameof(GetProductById))]
         public IActionResult GetProductById(int id)
         {
             var result = _IProduct.GetProduct(id);
-            var ProductMap = _mapper.Map<ProductModel>(result);
             if (result is not null)
             {
-                return Ok(ProductMap);
+                return Ok(result);
             }
             return BadRequest("No record Found");
         }
@@ -39,10 +35,9 @@ namespace ExamProyect.Controllers.v1
         public IActionResult GetAllProduct()
         {
             var result = _IProduct.GetAllProducts();
-            var ProductMap = _mapper.Map<List<ProductModel>>(result);
             if (result.Count() > 0)
             {
-                return Ok(ProductMap);
+                return Ok(result);
             }
 
             return BadRequest("No record loaded");
@@ -51,9 +46,7 @@ namespace ExamProyect.Controllers.v1
         public ActionResult InsertProduct(EditProductModel product)
         {
 
-            var productMap = _mapper.Map<Product>(product);
-
-            var result = _IProduct.InsertProduct(productMap);
+            var result = _IProduct.InsertProduct(product);
             if (result)
             {
                 return Ok("Created!");
@@ -65,8 +58,7 @@ namespace ExamProyect.Controllers.v1
         [HttpPut(nameof(UpdateProduct))]
         public ActionResult UpdateProduct(ProductModel product)
         {
-            var productMap = _mapper.Map<Product>(product);
-            var result = _IProduct.UpdateProduct(productMap);
+            var result = _IProduct.UpdateProduct(product);
             if (result)
             {
                 return Ok("Updated!");
@@ -77,8 +69,7 @@ namespace ExamProyect.Controllers.v1
         [HttpDelete(nameof(DeleteProduct))]
         public ActionResult DeleteProduct(ProductModel product)
         {
-            var productMap = _mapper.Map<Product>(product);
-            var result = _IProduct.DeleteProduct(productMap);
+            var result = _IProduct.DeleteProduct(product);
             if (result)
             {
                 return Ok("Deleted!");

@@ -1,9 +1,8 @@
 ﻿using Authentication;
 using AutoMapper;
-using Domain.Model;
-using ExamProyect.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Repository.Model;
 using Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -18,22 +17,19 @@ namespace ExamProyect.Controllers.v1
     public class UserController : Controller
     {
         private readonly IUser _IUser;
-        private readonly IMapper _mapper;
         private readonly IJWTServices _iJWTService;
         public UserController(IUser iUser, IMapper mapper, IJWTServices jWTServices)
         {
             _IUser = iUser;
-            _mapper = mapper;
             _iJWTService = jWTServices;
         }
         [HttpGet(nameof(GetUserById))]
         public IActionResult GetUserById(int id)
         {
             var result = _IUser.GetUser(id);
-            var userMap = _mapper.Map<UserModel>(result);
             if (result is not null)
             {
-                return Ok(userMap);
+                return Ok(result);
             }
             return BadRequest("No record Found");
         }
@@ -42,10 +38,9 @@ namespace ExamProyect.Controllers.v1
         public IActionResult GetAllUser()
         {
             var result = _IUser.GetAllUsers();
-            var userMap = _mapper.Map<List<UserModel>>(result);
             if(result.Count() > 0)
             {
-                return Ok(userMap);
+                return Ok(result);
             }
 
             return BadRequest("No record loaded");
@@ -54,10 +49,8 @@ namespace ExamProyect.Controllers.v1
         [HttpPost(nameof(InsertUser))]
         public ActionResult InsertUser(EditUserModel user)
         {
-
-            var userMap = _mapper.Map<User>(user);
             
-            var result = _IUser.InsertUser(userMap);
+            var result = _IUser.InsertUser(user);
             if (result)
             {
                 return Ok("Created!");
@@ -67,10 +60,9 @@ namespace ExamProyect.Controllers.v1
         }
 
         [HttpPut(nameof(UpdateUser))]
-        public ActionResult UpdateUser(UserModel user)
+        public ActionResult UpdateUser(EditUserModel user)
         {
-            var userMap = _mapper.Map<User>(user);
-            var result = _IUser.UpdateUser(userMap);
+            var result = _IUser.UpdateUser(user);
             if (result)
             {
                 return Ok("Updated");
@@ -81,8 +73,7 @@ namespace ExamProyect.Controllers.v1
         [HttpDelete]
         public ActionResult DeleteUser(UserModel user)
         {
-            var userMap = _mapper.Map<User>(user);
-            var result = _IUser.DeleteUser(userMap);
+            var result = _IUser.DeleteUser(user);
             if (result)
             {
                 return Ok("Deleted");

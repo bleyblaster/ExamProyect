@@ -1,5 +1,7 @@
-﻿using Domain.Model;
+﻿using AutoMapper;
+using Domain.Model;
 using Repository.Repository;
+using Repository.Model;
 using Services.IServices;
 using System;
 using System.Collections.Generic;
@@ -13,27 +15,35 @@ namespace Services.Services
     public class UserService : IUser
     {
         private IRepository<User> _UserRepository;
-        public UserService(IRepository<User> userRepository)
+        private IMapper _mapper;
+        public UserService(IRepository<User> userRepository, IMapper mapper)
         {
             _UserRepository = userRepository;
+            _mapper = mapper;
         }
-        public User GetUser(int Id)
+        public UserModel GetUser(int Id)
         {
-            return _UserRepository.Get(Id);
+            var userEntity = _UserRepository.Get(Id);
+            var userModel = _mapper.Map<UserModel>(userEntity);
+            return userModel;
         }
-        public IEnumerable<User> GetAllUsers()
+        public IEnumerable<UserModel> GetAllUsers()
         {
-            return _UserRepository.GetAll();
+            var userEntity = _UserRepository.GetAll();
+            var userModel = _mapper.Map<List<UserModel>>(userEntity);
+            return userModel;
         }
-        public bool InsertUser(User user)
+        public bool InsertUser(EditUserModel user)
         {
-            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-            user.IsActive = true;
-            user.ModifiedDate = DateTime.Now;
-            _UserRepository.Insert(user);
+            var userEntity = _mapper.Map<User>(user);
+
+            userEntity.Password = BCrypt.Net.BCrypt.HashPassword(userEntity.Password);
+            userEntity.IsActive = true;
+            userEntity.ModifiedDate = DateTime.Now;
+            _UserRepository.Insert(userEntity);
             return _UserRepository.SaveChanges();
         }
-        public bool UpdateUser(User user)
+        public bool UpdateUser(EditUserModel user)
         {
             var userObject = _UserRepository.Get(user.Id);
             if(userObject != null)
@@ -51,9 +61,9 @@ namespace Services.Services
                 userObject.ModifiedDate = DateTime.Now;
                 _UserRepository.Update(userObject);
             }
-            return _UserRepository.SaveChanges();
+            return userObject != null && _UserRepository.SaveChanges();
         }
-        public bool DeleteUser(User user, bool isLogicalDelete = true)
+        public bool DeleteUser(UserModel user, bool isLogicalDelete = true)
         {
             if (isLogicalDelete)
             {
@@ -66,7 +76,8 @@ namespace Services.Services
             }
             else
             {
-                _UserRepository.Delete(user);
+                var userEntity = _mapper.Map<User>(user);
+                _UserRepository.Delete(userEntity);
             }
 
             return _UserRepository.SaveChanges();

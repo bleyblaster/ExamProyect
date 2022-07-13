@@ -7,11 +7,11 @@ namespace Services.IServices
 {
    public interface IUser
     {
-        System.Collections.Generic.IEnumerable<Domain.Model.User> GetAllUsers();
-        Domain.Model.User GetUser(int Id);
-        bool InsertUser(Domain.Model.User user);
-        bool UpdateUser(Domain.Model.User user);
-        bool DeleteUser(Domain.Model.User user, bool isLogicalDelete = true);
+        System.Collections.Generic.IEnumerable<Repository.Model.UserModel> GetAllUsers();
+        Repository.Model.UserModel GetUser(int Id);
+        bool InsertUser(Repository.Model.EditUserModel user);
+        bool UpdateUser(Repository.Model.EditUserModel user);
+        bool DeleteUser(Repository.Model.UserModel user, bool isLogicalDelete = true);
         bool IsValidUser(string user, string password);
     }
 }
